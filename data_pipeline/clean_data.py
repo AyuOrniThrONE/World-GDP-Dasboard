@@ -2,7 +2,7 @@ import pandas as pd
 
 df = pd.read_csv("data/gdp_data.csv")
 
-df = df.dropna()
+df = df.fillna(0.0)
 
 df["year"] = df["year"].astype(int)
 
