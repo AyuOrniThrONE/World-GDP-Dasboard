@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import math
-from pathlib import Path
 
 st.set_page_config(
     page_title='GDP Dashboard',
@@ -12,8 +11,7 @@ st.set_page_config(
 def get_gdp_data():
     '''Grab GDP Data from CSV File'''
 
-    DATA_FILENAME = Path(__file__).parent/'data/gdp_data.csv'
-    raw_gdp_df = pd.read_csv(DATA_FILENAME)
+    raw_gdp_df = pd.read_csv("../data/gdp_data1.csv")
 
     MIN_YEAR = 1960
     MAX_YEAR = 2024
