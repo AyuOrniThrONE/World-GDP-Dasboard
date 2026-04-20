@@ -1,140 +1,110 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
+import math
 
-# Page config
-st.set_page_config(page_title="World GDP Dashboard")
+st.set_page_config(
+    page_title='GDP Dashboard',
+    page_icon = ':earth_asia:'
+) 
 
-# Load data
 @st.cache_data
-def load_data():
-    return pd.read_csv("../data/gdp_data.csv")
+def get_gdp_data():
+    '''Grab GDP Data from CSV File'''
 
-df = load_data()
-# Title
-st.title("🌍 World GDP Growth Dashboard")
-st.markdown("Analyze global economic trends interactively")
+    raw_gdp_df = pd.read_csv("../data/gdp_data1.csv")
 
-st.sidebar.header("Filters")
+    MIN_YEAR = 1960
+    MAX_YEAR = 2024
 
-countries = df["country"].unique()
+    gdp_df = raw_gdp_df.melt(
+        ['REF_AREA'],
+        [str(x) for x in range(MIN_YEAR,MAX_YEAR+1)],
+        'Year',
+        'GDP',
+    )
+    gdp_df['Year'] = pd.to_numeric(gdp_df['Year'])
 
-selected_country = st.sidebar.selectbox("Select Country", countries)
+    return gdp_df
 
-year_range = st.sidebar.slider(
-    "Select Year Range",
-    int(df["year"].min()),
-    int(df["year"].max()),
-    (2000, 2022)
+gdp_df = get_gdp_data()
+
+
+# Draw the actual page
+
+# Set the title that appears at the top of the page.
+'''
+# :earth_asia: World GDP Dashboard
+
+Browse GDP data from the [World Bank Open Data](https://data.worldbank.org/) website. As you'll
+notice, the data only goes to 2024 right now, and datapoints for certain years are often missing.
+But it's otherwise a great (and did I mention _free_?) source of data.
+'''
+
+# Add some spacing
+''
+''
+
+min_value = gdp_df['Year'].min()
+max_value = gdp_df['Year'].max()
+
+from_year, to_year = st.slider(
+    'Which years are you interested in?',
+    min_value = min_value,
+    max_value=max_value,
+    value = [min_value,max_value]
 )
 
-filtered_df = df[
-    (df["country"] == selected_country) &
-    (df["year"] >= year_range[0]) &
-    (df["year"] <= year_range[1])
+countries = gdp_df['REF_AREA'].unique()
+
+if not len(countries):
+    st.warning("Select atleast one country")
+selected_countries = st.multiselect(
+    'Which countries would you like to view?',countries,['DEU','FRA','IND','BRA','GBR','JPN']
+)
+''
+''
+''
+
+filtered_gdp_df = gdp_df[
+    (gdp_df['REF_AREA'].isin(selected_countries)) & (gdp_df['Year']<=to_year) & (from_year <= gdp_df['Year'])
 ]
 
-st.subheader(f"GDP Growth Trend - {selected_country}")
+st.header('GDP over time', divider='gray')
 
-fig = px.line(
-    filtered_df,
-    x="year",
-    y="gdp_growth",
-    title="GDP Growth Over Time"
+''
+
+st.line_chart(
+    filtered_gdp_df,
+    x='Year',
+    y='GDP',
+    color='REF_AREA'
 )
+''
+''
 
-st.plotly_chart(fig)
+first_year = gdp_df[gdp_df['Year']==from_year]
+last_year = gdp_df[gdp_df['Year']==to_year]
 
-st.subheader("Trend vs Smoothed Growth")
+st.header(f'GDP in {to_year}',divider='gray')
+cols = st.columns(4)
 
-fig2 = px.line(
-    filtered_df,
-    x="year",
-    y=["gdp_growth", "gdp_rolling_avg"],
-    title="Actual vs Rolling Average"
-)
+for i, country in enumerate(selected_countries):
+    col = cols[i%len(cols)]
 
-st.plotly_chart(fig2)
+    with col:
+        first_gdp = first_year[gdp_df['REF_AREA']== country]['GDP'].iat[0]/1000000000
+        last_gdp = last_year[gdp_df['REF_AREA']==country]['GDP'].iat[0] / 1000000000
+        if math.isnan(first_gdp):
+            growth = 'n/a'
+            delta_color = 'off'
+        else:
+            growth = f'{last_gdp / first_gdp:,.2f}x'
+            delta_color = 'normal'
 
-st.subheader("Top 10 Countries by Latest GDP Growth")
-
-latest_year = df["year"].max()
-
-top10 = df[df["year"] == latest_year].sort_values("gdp_growth", ascending=False).head(10)
-
-fig3 = px.bar(
-    top10,
-    x="country",
-    y="gdp_growth",
-    title="Top 10 Economies"
-)
-
-st.plotly_chart(fig3)
-
-st.subheader("Bottom 10 Countries (Economic Decline)")
-
-bottom10 = df[df["year"] == latest_year].sort_values("gdp_growth").head(10)
-
-fig4 = px.bar(
-    bottom10,
-    x="country",
-    y="gdp_growth",
-    title="Lowest GDP Growth"
-)
-
-st.plotly_chart(fig4)
-
-st.subheader("Growth Category Distribution")
-
-category_count = df["growth_category"].value_counts()
-
-fig5 = px.pie(
-    values=category_count.values,
-    names=category_count.index,
-    title="Global Growth Categories"
-)
-
-st.plotly_chart(fig5)
-
-st.subheader("Global GDP Growth Map")
-
-years = df["year"].sort_values().unique()
-select_year = st.selectbox("Select Year", years)
-
-map_df = df[df["year"] == select_year]
-
-fig6 = px.choropleth(
-    map_df,
-    locations="country",
-    locationmode="ISO-3",
-    color="gdp_growth",
-    title=f"GDP Growth by Country in {select_year}",
-    color_continuous_scale="Viridis"
-)
-
-st.plotly_chart(fig6)
-st.markdown("""
-### 📊 Insights
-- Compare GDP growth across countries  
-- Identify high-growth economies  
-- Analyze long-term economic trends  
-""")
-
-st.markdown("""
-### 📊 Advanced Analytics 
-""")
-
-selected_countries = st.sidebar.multiselect("Compare Countries", countries)
-
-compare_df = df[df["country"].isin(selected_countries)]
-
-fig7=px.line(compare_df, x="year", y="gdp_growth", color="country",title=f"Multi-Country Comparison")
-st.plotly_chart(fig7)
-
-st.metric("Latest GDP Growth", round(filtered_df["gdp_growth"].iloc[-1], 2),border=True)
-
-st.download_button(
-    "Download Data",
-    filtered_df.to_csv(index=False),
-    "gdp_data.csv"
-)
+        st.metric(
+            label=f'{country} GDP',
+            value=f'{last_gdp:,.0f}B',
+            delta=growth,
+            delta_color=delta_color
+        )
+        ''
