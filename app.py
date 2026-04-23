@@ -1,6 +1,9 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import matplotlib.pyplot as plt
+from model.gdp_forecast import forecast_country
+import plotly.graph_objects as go
 
 # Page config
 st.set_page_config(page_title="World GDP Dashboard")
@@ -8,7 +11,7 @@ st.set_page_config(page_title="World GDP Dashboard")
 # Load data
 @st.cache_data
 def load_data():
-    return pd.read_csv("../data/gdp_data.csv")
+    return pd.read_csv("data/gdp_data.csv")
 
 df = load_data()
 # Title
@@ -138,3 +141,51 @@ st.download_button(
     filtered_df.to_csv(index=False),
     "gdp_data.csv"
 )
+
+st.subheader("📈 GDP Forecast")
+
+forecast_years = st.slider("Years to Predict", 1, 10, 5)
+
+if st.button("Generate Forecast"):
+    forecast, model = forecast_country(df, selected_country, forecast_years)
+
+    # Plot forecast
+    fig_forecast = model.plot(forecast)
+    st.pyplot(fig_forecast)
+
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatter(
+        x=forecast["ds"],
+        y=forecast["yhat"],
+        mode='lines',
+        name='Forecast'
+    ))
+
+    fig.add_trace(go.Scatter(
+        x=forecast["ds"],
+        y=forecast["yhat_upper"],
+        mode='lines',
+        name='Upper Bound',
+        line=dict(dash='dot')
+    ))
+
+    fig.add_trace(go.Scatter(
+        x=forecast["ds"],
+        y=forecast["yhat_lower"],
+        mode='lines',
+        name='Lower Bound',
+        line=dict(dash='dot')
+    ))
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    latest_prediction = forecast.tail(1)
+
+    st.markdown(f"""
+    ### 📊 Forecast Insight
+
+    - Predicted GDP Growth: **{round(latest_prediction['yhat'].values[0], 2)}%**
+    - Trend: {'Increasing 📈' if latest_prediction['trend'].values[0] > 0 else 'Decreasing 📉'}
+    """)
