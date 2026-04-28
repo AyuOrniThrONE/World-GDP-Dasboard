@@ -3,6 +3,7 @@ import pandas as pd
 import plotly.express as px
 import matplotlib.pyplot as plt
 from model.gdp_forecast import forecast_country
+from model.country_clustering import cluster_countries
 import plotly.graph_objects as go
 
 # Page config
@@ -189,3 +190,30 @@ if st.button("Generate Forecast"):
     - Predicted GDP Growth: **{round(latest_prediction['yhat'].values[0], 2)}%**
     - Trend: {'Increasing 📈' if latest_prediction['trend'].values[0] > 0 else 'Decreasing 📉'}
     """)
+
+st.subheader("🌍 Country Economic Clustering")
+
+cluster_df = cluster_countries(df)
+cluster_df["cluster_label"] = cluster_df["clusters"].map({
+    0: "High Growth Economies 🚀",
+    1: "Stable Economies 📊",
+    2: "Struggling Economies ⚠️"
+})
+
+fig_cluster = px.scatter(
+    cluster_df,
+    x="gdp_growth",
+    y="cumulative_growth",
+    color="cluster_label",
+    hover_name="country",
+    title="Country Economic Clusters"
+)
+
+st.plotly_chart(fig_cluster, use_container_width=True)
+
+cluster_counts = cluster_df["clusters"].value_counts()
+
+st.markdown("### 📊 Cluster Distribution")
+
+st.write(cluster_counts)
+
