@@ -1,10 +1,12 @@
 # World GDP Dashboard
 
-> An interactive data visualization dashboard for exploring global Gross Domestic Product (GDP) trends across countries and years.
+> An end-to-end global economic analytics platform with interactive dashboards, time-series forecasting, and machine learning-based country segmentation using Python, Streamlit, and Scikit-learn.
 
 ---
-
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://ayu-world-gdp-dashboard.streamlit.app/)
+For the Old Dashboard:
+[![Old Dashboard](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://ayu-world-gdp-dashboard.streamlit.app/)
+, and for the new dashboard:
+[![New Dashboard](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://ayu-world-gdp-dashboard-upgraded.streamlit.app/)
 
 
 ## Table of Contents
@@ -16,7 +18,7 @@
 - [Technologies Used](#technologies-used)
 - [Architecture Overview](#architecture-overview)
 - [Project Structure](#project-structure)
-- [How to run](#How-to-run-it-on-your-own-machine)
+- [How to run](#how-to-run)
 - [Usage](#usage)
 - [Data Analysis Insights](#data-analysis-insights)
 - [Limitations](#limitations)
@@ -53,6 +55,10 @@ The dashboard allows users to interactively explore GDP data by:
 - Comparing economic output
 - Observing global GDP trends
 - Analyzing country-level economic growth patterns
+- Analyze GDP growth trends across countries
+- Forecast future economic performance using time-series models
+- Segment countries into economic clusters using machine learning
+- Visualize global economic patterns through interactive dashboards
 
 The dashboard converts static economic datasets into **interactive visual insights**, making complex economic data easier to understand.
 
@@ -62,20 +68,26 @@ The dashboard converts static economic datasets into **interactive visual insigh
 
 Key features of the dashboard include:
 
-### Interactive Data Visualization
-Users can dynamically interact with the dataset and visualize GDP values across different countries and time periods.
+### 📊 Interactive Dashboard
+- Country-wise GDP analysis
+- Multi-year trend visualization
+- Global comparisons
 
-### Country-Level Analysis
-Allows exploration of GDP performance for individual countries.
+### 🔮 Forecasting (Machine Learning)
+- Time-series forecasting using Prophet
+- Future GDP predictions with confidence intervals
 
-### Year-Based Filtering
-Users can analyze GDP values across different years to identify growth patterns.
+### 🌍 Country Clustering
+- K-Means clustering for economic segmentation
+- Identifies:
+  - High-growth economies
+  - Stable economies
+  - Struggling economies
 
-### Simple and Intuitive Interface
-The dashboard is designed to be minimal, intuitive, and easy to navigate.
-
-### Real-Time Data Exploration
-Users can instantly change filters and view updated visualizations.
+### 📈 Advanced Analytics
+- Rolling averages
+- Growth change tracking
+- Volatility analysis
 
 ---
 
@@ -122,6 +134,7 @@ The dashboard is built using the following technologies:
 # Architecture Overview
 
 The dashboard follows a simple architecture:
+```bash
 Data Source
 │
 ▼
@@ -133,28 +146,40 @@ Visualization Layer
 │
 ▼
 Interactive Dashboard
-
+```
 ## Project Structure
 ```bash
 PrisonEscapeDA/
 │
 ├── data
     ├── gdp_data.csv
+    ├── gdp_data1.csv
+├── model
+    ├── country_clustering.py
+    ├── gdp_forecast.py
+├── dashboard
+    ├── streamlit_app.py
+├── analysis
+    ├── eda.ipynb
+├── data_pipeline
+    ├── clean_data.py
+    ├── feature_engg.py
+    ├── fetch_gdp.py
 ├── requirements.txt
-├── streamlit_app.py
+├── app.py
 ├── README.md
 ```
 
 
 ### File Description
 
-**streamlit_app.py**
+**streamlit_app.py and app.py**
 
 Main application file that runs the Streamlit dashboard.
 
 **data/**
 
-Contains the dataset used for GDP analysis.
+Contains the dataset used for GDP analysis. One is Properly Extracted and Pre-Cleaned Data (gdp_data1.csv), and another is the API Fetched Dataset (gdp_data.csv)
 
 **requirements.txt**
 
@@ -164,7 +189,7 @@ Lists all Python dependencies required to run the application.
 
 Project documentation.
 
-### How to run it on your own machine
+### How to run
 ---
 
 1. Install the requirements
@@ -174,9 +199,13 @@ Project documentation.
    ```
 
 2. Run the app
-
+   For Old Dashboard Analytics, run
    ```
    $ streamlit run streamlit_app.py
+   ```
+   For New Dashboard Analytics, run
+   ```
+   $ streamlit run app.py
    ```
 
 # Usage
@@ -230,9 +259,9 @@ Add datasets for:
 ### Advanced Visualizations
 Integrate more advanced charts such as:
 
-- World GDP heat maps
-- GDP growth comparison graphs
-- Animated economic timelines
+- World GDP heat maps (Completed)
+- GDP growth comparison graphs (Completed)
+- Animated economic timelines (Completed)
 
 ### Deployment
 Deploy the dashboard using:
