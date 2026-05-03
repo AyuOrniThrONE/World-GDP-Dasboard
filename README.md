@@ -149,59 +149,42 @@ Interactive Dashboard
 ```
 ## Project Structure
 ```bash
-PrisonEscapeDA/
+GDP Dashboard/
 │
-├── data
-    ├── gdp_data.csv
-    ├── gdp_data1.csv
-├── model
-    ├── country_clustering.py
-    ├── gdp_forecast.py
-├── dashboard
-    ├── streamlit_app.py
-├── analysis
-    ├── eda.ipynb
-├── data_pipeline
-    ├── clean_data.py
-    ├── feature_engg.py
-    ├── fetch_gdp.py
-├── requirements.txt
-├── app.py
-├── README.md
+├── app.py                  # Main Streamlit application
+├── data/
+│   ├── gdp_data.csv        # Processed GDP dataset
+├── data_pipeline/
+│   ├── run_pipeline.py     # Script to automate fetching and processing
+│   ├── fetch_gdp.py        # Fetches raw GDP data from World Bank API
+│   ├── clean_data.py       # Cleans the raw data
+│   ├── feature_engg.py     # Generates features for analysis
+├── model/
+│   ├── country_clustering.py # K-Means clustering model
+│   ├── gdp_forecast.py       # Prophet forecasting model
+├── requirements.txt        # Dependencies
+├── README.md               # Documentation
 ```
 
-
-### File Description
-
-**streamlit_app.py and app.py**
-
-Main application file that runs the Streamlit dashboard.
-
-**data/**
-
-Contains the dataset used for GDP analysis. One is Properly Extracted and Pre-Cleaned Data (gdp_data1.csv), and another is the API Fetched Dataset (gdp_data.csv)
-
-**requirements.txt**
-
-Lists all Python dependencies required to run the application.
-
-**README.md**
-
-Project documentation.
-
-### How to run
+### How to run it on your own machine
 ---
 
 1. Install the requirements
 
-   ```
-   $ pip install -r requirements.txt
+   ```bash
+   pip install -r requirements.txt
    ```
 
-2. Run the app
-   For Old Dashboard Analytics, run
+2. (Optional) Re-run the data pipeline to fetch latest data
+   
+   ```bash
+   python data_pipeline/run_pipeline.py
    ```
-   $ streamlit run streamlit_app.py
+
+3. Run the Streamlit dashboard
+
+   ```bash
+   streamlit run app.py
    ```
    For New Dashboard Analytics, run
    ```
