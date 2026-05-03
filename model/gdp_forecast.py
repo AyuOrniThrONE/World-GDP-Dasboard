@@ -33,7 +33,7 @@ def forecast_country(df, country, years=5):
         return None, None
 
     # Create future dataframe
-    future = model.make_future_dataframe(periods=years, freq="Y")
+    future = model.make_future_dataframe(periods=years, freq="YE")
 
     # Predict
     forecast = model.predict(future)
